@@ -6,13 +6,59 @@ export default function App() {
   const [result, setResult] = useState("");
   const [currentInput, setCurrentInput] = useState("");
 
+  // Funktion zur Berechnung
+  const calculate = () => {
+    try {
+      // Hier werden wir den aktuellen Ausdruck Schritt für Schritt parsen und berechnen
+      const operators = ["+", "-", "*", "/"];
+      let numbers = [];
+      let operations = [];
+      let tempNum = "";
+
+      // Ausdruck analysieren, Zahlen und Operatoren trennen
+      for (let i = 0; i < currentInput.length; i++) {
+        const char = currentInput[i];
+        if (operators.includes(char)) {
+          numbers.push(parseFloat(tempNum));
+          operations.push(char);
+          tempNum = "";
+        } else {
+          tempNum += char;
+        }
+      }
+      numbers.push(parseFloat(tempNum)); // Füge die letzte Zahl hinzu
+
+      // Berechnungen Schritt für Schritt durchführen
+      let total = numbers[0];
+      for (let i = 0; i < operations.length; i++) {
+        const nextNum = numbers[i + 1];
+        switch (operations[i]) {
+          case "+":
+            total += nextNum;
+            break;
+          case "-":
+            total -= nextNum;
+            break;
+          case "*":
+            total *= nextNum;
+            break;
+          case "/":
+            total /= nextNum;
+            break;
+          default:
+            throw new Error("Ungültiger Operator");
+        }
+      }
+
+      setResult(total.toString());
+    } catch (error) {
+      setResult("Error");
+    }
+  };
+
   const handleButtonPress = (value) => {
     if (value === "=") {
-      try {
-        setResult(eval(currentInput).toString());
-      } catch (error) {
-        setResult("Error");
-      }
+      calculate();
     } else if (value === "C") {
       setCurrentInput("");
       setResult("");
