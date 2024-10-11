@@ -5,17 +5,16 @@ import { StyleSheet, Text, View, Button } from "react-native";
 export default function App() {
   const [result, setResult] = useState("");
   const [currentInput, setCurrentInput] = useState("");
+  const [lastInputWasOperator, setLastInputWasOperator] = useState(false);
 
-  // Funktion zur Berechnung
+  // Funktion zur Berechnung ohne eval
   const calculate = () => {
     try {
-      // Hier werden wir den aktuellen Ausdruck Schritt für Schritt parsen und berechnen
       const operators = ["+", "-", "*", "/"];
       let numbers = [];
       let operations = [];
       let tempNum = "";
 
-      // Ausdruck analysieren, Zahlen und Operatoren trennen
       for (let i = 0; i < currentInput.length; i++) {
         const char = currentInput[i];
         if (operators.includes(char)) {
@@ -28,7 +27,6 @@ export default function App() {
       }
       numbers.push(parseFloat(tempNum)); // Füge die letzte Zahl hinzu
 
-      // Berechnungen Schritt für Schritt durchführen
       let total = numbers[0];
       for (let i = 0; i < operations.length; i++) {
         const nextNum = numbers[i + 1];
@@ -57,13 +55,28 @@ export default function App() {
   };
 
   const handleButtonPress = (value) => {
+    const operators = ["+", "-", "*", "/"];
+
     if (value === "=") {
-      calculate();
+      if (!lastInputWasOperator) {
+        calculate();
+      }
     } else if (value === "C") {
       setCurrentInput("");
       setResult("");
+      setLastInputWasOperator(false);
     } else {
-      setCurrentInput(currentInput + value);
+      if (operators.includes(value)) {
+        // Überprüfen, ob der letzte eingegebene Wert ein Operator war
+        if (!lastInputWasOperator && currentInput.length > 0) {
+          setCurrentInput(currentInput + value);
+          setLastInputWasOperator(true); // Markiere, dass der letzte Input ein Operator war
+        }
+      } else {
+        // Wenn eine Zahl eingegeben wird, zurücksetzen
+        setCurrentInput(currentInput + value);
+        setLastInputWasOperator(false);
+      }
     }
   };
 
