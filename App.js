@@ -1,13 +1,19 @@
 import { StatusBar } from "expo-status-bar";
 import { useState } from "react";
-import { StyleSheet, Text, View, TouchableOpacity } from "react-native";
+import {
+  StyleSheet,
+  Text,
+  View,
+  TouchableOpacity,
+  ScrollView,
+} from "react-native";
 
 export default function App() {
   const [result, setResult] = useState("");
   const [currentInput, setCurrentInput] = useState("");
   const [lastInputWasOperator, setLastInputWasOperator] = useState(false);
+  const [history, setHistory] = useState([]);
 
-  // Funktion zur Berechnung ohne eval
   const calculate = () => {
     try {
       const operators = ["+", "-", "*", "/"];
@@ -25,7 +31,7 @@ export default function App() {
           tempNum += char;
         }
       }
-      numbers.push(parseFloat(tempNum)); // Füge die letzte Zahl hinzu
+      numbers.push(parseFloat(tempNum));
 
       let total = numbers[0];
       for (let i = 0; i < operations.length; i++) {
@@ -49,6 +55,8 @@ export default function App() {
       }
 
       setResult(total.toString());
+      setHistory([...history, `${currentInput} = ${total}`]); // Ausdruck und Ergebnis zur Historie hinzufügen
+      setCurrentInput(""); // Nach Berechnung den Eingabewert zurücksetzen
     } catch (error) {
       setResult("Error");
     }
@@ -78,19 +86,37 @@ export default function App() {
     }
   };
 
-  const renderButton = (value) => (
-    <TouchableOpacity
-      key={value}
-      style={styles.button}
-      onPress={() => handleButtonPress(value)}
-    >
-      <Text style={styles.buttonText}>{value}</Text>
-    </TouchableOpacity>
-  );
+  const renderButton = (value) => {
+    const operatorButtons = ["+", "-", "*", "/", "="];
+    const buttonStyle = operatorButtons.includes(value)
+      ? styles.operatorButton
+      : styles.button;
+
+    return (
+      <TouchableOpacity
+        key={value}
+        style={buttonStyle}
+        onPress={() => handleButtonPress(value)}
+      >
+        <Text style={styles.buttonText}>{value}</Text>
+      </TouchableOpacity>
+    );
+  };
 
   return (
     <View style={styles.container}>
       <Text style={styles.result}>{result || currentInput || "0"}</Text>
+
+      {/* Historie anzeigen */}
+      <ScrollView style={styles.historyContainer}>
+        {history.map((entry, index) => (
+          <Text key={index} style={styles.historyText}>
+            {entry}
+          </Text>
+        ))}
+      </ScrollView>
+
+      {/* Buttons */}
       <View style={styles.row}>{["1", "2", "3", "+"].map(renderButton)}</View>
       <View style={styles.row}>{["4", "5", "6", "-"].map(renderButton)}</View>
       <View style={styles.row}>{["7", "8", "9", "*"].map(renderButton)}</View>
@@ -110,8 +136,17 @@ const styles = StyleSheet.create({
   result: {
     fontSize: 40,
     textAlign: "right",
-    marginBottom: 40,
+    marginBottom: 10,
     color: "white",
+  },
+  historyContainer: {
+    maxHeight: 150, // Platz für die Historie reservieren
+    marginBottom: 20,
+  },
+  historyText: {
+    color: "white",
+    fontSize: 18,
+    textAlign: "right",
   },
   row: {
     flexDirection: "row",
@@ -119,7 +154,15 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   button: {
-    backgroundColor: "#FF5F1F", // grüne Farbe für Buttons
+    backgroundColor: "#FF5F1F",
+    paddingVertical: 20,
+    paddingHorizontal: 30,
+    borderRadius: 5,
+    minWidth: 80,
+    alignItems: "center",
+  },
+  operatorButton: {
+    backgroundColor: "#007BFF",
     paddingVertical: 20,
     paddingHorizontal: 30,
     borderRadius: 5,
@@ -128,6 +171,6 @@ const styles = StyleSheet.create({
   },
   buttonText: {
     fontSize: 20,
-    color: "#fff", // weiße Schriftfarbe
+    color: "#fff",
   },
 });
