@@ -1,6 +1,6 @@
 import { StatusBar } from "expo-status-bar";
 import { useState } from "react";
-import { StyleSheet, Text, View, Button } from "react-native";
+import { StyleSheet, Text, View, TouchableOpacity } from "react-native";
 
 export default function App() {
   const [result, setResult] = useState("");
@@ -67,58 +67,34 @@ export default function App() {
       setLastInputWasOperator(false);
     } else {
       if (operators.includes(value)) {
-        // Überprüfen, ob der letzte eingegebene Wert ein Operator war
         if (!lastInputWasOperator && currentInput.length > 0) {
           setCurrentInput(currentInput + value);
-          setLastInputWasOperator(true); // Markiere, dass der letzte Input ein Operator war
+          setLastInputWasOperator(true);
         }
       } else {
-        // Wenn eine Zahl eingegeben wird, zurücksetzen
         setCurrentInput(currentInput + value);
         setLastInputWasOperator(false);
       }
     }
   };
 
+  const renderButton = (value) => (
+    <TouchableOpacity
+      key={value}
+      style={styles.button}
+      onPress={() => handleButtonPress(value)}
+    >
+      <Text style={styles.buttonText}>{value}</Text>
+    </TouchableOpacity>
+  );
+
   return (
     <View style={styles.container}>
       <Text style={styles.result}>{result || currentInput || "0"}</Text>
-      <View style={styles.row}>
-        {["1", "2", "3", "+"].map((value) => (
-          <Button
-            key={value}
-            title={value}
-            onPress={() => handleButtonPress(value)}
-          />
-        ))}
-      </View>
-      <View style={styles.row}>
-        {["4", "5", "6", "-"].map((value) => (
-          <Button
-            key={value}
-            title={value}
-            onPress={() => handleButtonPress(value)}
-          />
-        ))}
-      </View>
-      <View style={styles.row}>
-        {["7", "8", "9", "*"].map((value) => (
-          <Button
-            key={value}
-            title={value}
-            onPress={() => handleButtonPress(value)}
-          />
-        ))}
-      </View>
-      <View style={styles.row}>
-        {["C", "0", "=", "/"].map((value) => (
-          <Button
-            key={value}
-            title={value}
-            onPress={() => handleButtonPress(value)}
-          />
-        ))}
-      </View>
+      <View style={styles.row}>{["1", "2", "3", "+"].map(renderButton)}</View>
+      <View style={styles.row}>{["4", "5", "6", "-"].map(renderButton)}</View>
+      <View style={styles.row}>{["7", "8", "9", "*"].map(renderButton)}</View>
+      <View style={styles.row}>{["C", "0", "=", "/"].map(renderButton)}</View>
       <StatusBar style="auto" />
     </View>
   );
@@ -127,17 +103,31 @@ export default function App() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#fff",
+    backgroundColor: "#1F3B4D",
     justifyContent: "center",
+    padding: 20,
   },
   result: {
-    fontSize: 32,
+    fontSize: 40,
     textAlign: "right",
-    margin: 20,
+    marginBottom: 10,
+    color: "white",
   },
   row: {
     flexDirection: "row",
     justifyContent: "space-around",
-    margin: 10,
+    marginBottom: 10,
+  },
+  button: {
+    backgroundColor: "#FF5F1F", // grüne Farbe für Buttons
+    paddingVertical: 20,
+    paddingHorizontal: 30,
+    borderRadius: 5,
+    minWidth: 80,
+    alignItems: "center",
+  },
+  buttonText: {
+    fontSize: 20,
+    color: "#fff", // weiße Schriftfarbe
   },
 });
