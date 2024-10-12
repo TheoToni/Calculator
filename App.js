@@ -110,7 +110,7 @@ const styles = StyleSheet.create({
   result: {
     fontSize: 40,
     textAlign: "right",
-    marginBottom: 10,
+    marginBottom: 40,
     color: "white",
   },
   row: {
